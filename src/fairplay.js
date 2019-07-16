@@ -73,7 +73,7 @@ const addKey = ({video, contentId, initData, cert, options, getLicense, eventBus
     keySession.contentId = contentId;
 
     keySession.addEventListener('webkitkeymessage', (event) => {
-      getLicense(options, contentId, event.message, (err, license) => {
+      getLicense(options, contentId, event, (err, license) => {
         if (eventBus) {
           eventBus.trigger('licenserequestattempted');
         }
@@ -126,7 +126,7 @@ const defaultGetContentId = (emeOptions, initData) => {
 };
 
 export const defaultGetLicense = (fairplayOptions) => {
-  return (emeOptions, contentId, keyMessage, callback) => {
+  return (emeOptions, contentId, event, callback) => {
     const headers = mergeAndRemoveNull(
       {'Content-type': 'application/octet-stream'},
       emeOptions.emeHeaders,
@@ -137,7 +137,7 @@ export const defaultGetLicense = (fairplayOptions) => {
       uri: fairplayOptions.licenseUri,
       method: 'POST',
       responseType: 'arraybuffer',
-      body: keyMessage,
+      body: event.message,
       headers
     }, (err, response, responseBody) => {
       if (err) {
